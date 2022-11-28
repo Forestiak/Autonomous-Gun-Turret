@@ -80,7 +80,7 @@ def callback(msg):
 						lidar1[i + 91] = 1
 			x = 0
 			x = (ii + i - 1) / 2
-			values.append(x)
+			values.append(x) #Store in queue
 	
 	print values
 	#time.sleep(1)

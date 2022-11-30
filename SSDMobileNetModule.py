@@ -1,7 +1,9 @@
 import jetson.inference
 import jetson.utils
 import cv2
-
+import motorModule
+xDegree = 0
+yDegree = 0 
 class mnSSD():
     def __init__(self,path,threshold):
         self.path = path
@@ -20,6 +22,8 @@ class mnSSD():
                 cv2.rectangle(img,(x1,y1),(x2,y2),(255,0,255),2)
                 cv2.putText(img, className, (x1+5,y1+15),cv2.FONT_HERSHEY_DUPLEX,0.75,(255,0,255),2)
                 if d.ClassID == 1:
+                    global xDegree
+                    global yDegree
                     # Center of the bounding box y-coordinate / x-coordinate 
                     xAxis,yAxis = int((d.Left+d.Right)/2),int((d.Top+d.Bottom)/2)
                     # Distance to the center of the camera screen
@@ -27,5 +31,5 @@ class mnSSD():
                     xDegree, yDegree = int(xDist/10.66), int(yDist/8)
                     print(xDegree, yDegree)
                     cv2.line(img,(xAxis,yAxis),(320,240),(0,255,0),3)
-                pass
-        return objects
+                else: pass
+        return objects, xDegree, yDegree

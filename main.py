@@ -10,13 +10,10 @@ def main():
 
     while True:
         success, img = cap.read()
-        objects = myModel.detect(img, True)[0]
         positionMotor = myModel.detect(img,True)[1]
         cv2.imshow("Image", img)
         cv2.waitKey(1)
         mM.motorModules.move(positionMotor)
-
-
 
 if __name__ == "__main__":
     main()

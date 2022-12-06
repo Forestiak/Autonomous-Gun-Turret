@@ -2,7 +2,7 @@ import jetson.inference
 import jetson.utils
 import cv2
 import motorModule
-xDegree = 0 
+xDegree = 0
 yDegree = 0
 class mnSSD():
     def __init__(self,path,threshold):
@@ -28,7 +28,8 @@ class mnSSD():
                     xAxis,yAxis = int((d.Left+d.Right)/2),int((d.Top+d.Bottom)/2)
                     # Distance to the center of the camera screen
                     xDegree,yDegree = int(((d.Left+d.Right)/2)-320),int(((d.Top+d.Bottom)/2)-240)
-                    print(xDegree, yDegree)
                     cv2.line(img,(xAxis,yAxis),(320,240),(0,255,0),3)
-                else: pass
+                else: 
+                    xDegree = 0
+                    yDegree = 0
         return objects, xDegree, yDegree

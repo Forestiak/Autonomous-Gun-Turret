@@ -29,6 +29,7 @@ class motorModules():
     def move_MotorX(stepsX,speed):
         # Set the first direction you want it to spin
         global directionX
+        # This is dependant on which way the A and B Ports on the motor driver are connected
         if stepsX < 0:
             directionX = CW
             stepsX = abs(stepsX)

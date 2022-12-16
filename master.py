@@ -350,15 +350,22 @@ while True:
             rospy.init_node('scan_values') #make new ROS node called scan_values responsible for subscribing to the /scan topic
             sub=rospy.Subscriber('/scan',LaserScan,callback) #create a new subscriber for the /scan topic. This subscriber will receive messages on the /scan topic and pass them to the callback function for further processing.
             rospy.spin() #tell the node to enter a loop where it will process any incoming messages on the /scan topic, passing them to the callback function as they are received. This loop will run until the node is shut down or the program is terminated.
-            case = 2
 
     if case == 1: #motors <-- camera
 
+        motorModules.move_MotorX(xtarget,0.0005)
+        motorModules.move_MotorY(ytarget,0.0005)
+
     if case == 2: #motors <-- lidar
         
+        maxi = 0
+
         for i in range(0,values.qsize()):
-            
 
-        move_MotorX(stepsX,0.0005)
+            if values(i) > maxi:
+                maxi = values(i)
 
+        maxi = maxi / 0.1125
+
+        motorModules.move_MotorX(maxi,0.0005)
         #0.1125

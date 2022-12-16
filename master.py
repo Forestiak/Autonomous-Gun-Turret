@@ -243,8 +243,8 @@ while True:
                     #cv2.rectangle(testImage,(left,top),(right,bottom),(0,0,255),2)
                 #cv2.putText(testImage,name,(left,top-6),font,.75,(0,255,255),2) 
                 
-                if pi==True | pi==pf: 
-                    if distance(centerx,centery)==True:
+                if pi==True | pi==pf: #if the person is priority or the objective isnt
+                    if distance(centerx,centery)==True: #if the person is closer
                         xtarget=centerx
                         ytarget=centery 
 
@@ -340,11 +340,11 @@ while True:
                 #time.sleep(1)
                 return values
 
-            for i in range(0,values.qsize()):
+            for i in range(0,values.qsize()): #delete objectives near camera center
                 if abs(values(i) - angle) > coincidence:
                     values.pop(i)
                     
-            if xtarget == 2000 & ytarget == 2000:
+            if xtarget == 2000 & ytarget == 2000: #if camera didnt detect something --> case = 1
                 case = 1
 
             rospy.init_node('scan_values') #make new ROS node called scan_values responsible for subscribing to the /scan topic
@@ -353,19 +353,23 @@ while True:
 
     if case == 1: #motors <-- camera
 
+        #pixels --> steps
+        xtarget = max(1,round((xtarget*0.9)-5))
+        ytarget = max(1,round((ytarget*0.9)-5))
+        #move motors based on camera input
         motorModules.move_MotorX(xtarget,0.0005)
         motorModules.move_MotorY(ytarget,0.0005)
 
     if case == 2: #motors <-- lidar
         
         maxi = 0
-
+        #select nearest target
         for i in range(0,values.qsize()):
 
             if values(i) > maxi:
                 maxi = values(i)
 
-        maxi = maxi / 0.1125
+        maxi = maxi / 0.1125 #degrees --> steps
 
-        motorModules.move_MotorX(maxi,0.0005)
-        #0.1125
+        motorModules.move_MotorX(maxi,0.0005) #move
+        #0.1125º = 1 step

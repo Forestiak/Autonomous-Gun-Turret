@@ -359,6 +359,8 @@ while True:
         #move motors based on camera input
         motorModules.move_MotorX(xtarget,0.0005)
         motorModules.move_MotorY(ytarget,0.0005)
+	values = []
+	
 
     if case == 2: #motors <-- lidar
         

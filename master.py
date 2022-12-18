@@ -22,7 +22,7 @@ import queue
 case = 0 #fsm
 
 angle = 90 # Angle which the turret is facing
-#1 step = 0.9º
+#1 step = 0.9 degrees
 
 #lidar variables:
 
@@ -318,7 +318,7 @@ while True:
 
                 i = 0
                 ii = 0
-                while i <= 180: #Scan 180º
+                while i <= 180: #Scan 180 degrees
                     i = i + 1
                     if lidar1[i + 90] == 1: #if it encounters something
                         ii = i #save first coordinate
@@ -374,4 +374,4 @@ while True:
         maxi = maxi / 0.1125 #degrees --> steps
 
         motorModules.move_MotorX(maxi,0.0005) #move
-        #0.1125º = 1 step
+        #0.1125 degrees = 1 step

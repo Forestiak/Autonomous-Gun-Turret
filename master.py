@@ -17,6 +17,7 @@ import RPi.GPIO as GPIO
 from time import sleep
 import SSDMobileNetModule as sm
 import math
+import queue
 
 case = 0 #fsm
 
@@ -28,7 +29,8 @@ angle = 90 # Angle which the turret is facing
 once = False
 lidar0 = 360*[None]
 lidar1 = 360*[None]
-values = []
+
+values = queue.Queue()
 coincidence = 25
 
 #motors
@@ -206,9 +208,7 @@ while True:
         
 
         frameRGB=cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
-   
 
-       
 
         #Rectangle marker
         rect_img = frame[(int(right1.y)+10):(int(left1.y)-10), (int(right1.x)+10):(int(left1.x)-10)]
@@ -288,25 +288,25 @@ while True:
                 #Scan the room again to compare and save it into lidar1
 
                 for i in range(0,180):
-                        i = 90 + i
+                    i = 90 + i
                     lidar1[i]=round(msg.ranges[i],1) #scaning the room and saving it
 
                 #Compare both arrays, if an angle changed more than the tolerance, convert it into a 1, otherwise into 0 (lidar1)
 
                 for i in range(0,180):
-                        i = 90 + i
+                    i = 90 + i
                     if abs(lidar0[i] - lidar1[i]) > tolerance: #Run the following code if the difference beween both arrays is bigger than the tolerance (20cm)
                         #convert lidar1 into a true/false array:
-                                lidar1[i]=1 
-                        else:
-                                lidar1[i]=0
+                        lidar1[i]=1 
+                    else:
+                        lidar1[i]=0
 
                 #Clear noise by converting alone points into 0 (Scales with group_range)
 
                 for i in range(0,180):
-                        i = 90 + i
+                    i = 90 + i
                     if lidar1[i] == 1: #if a true is detected
-                                kill = 0
+                        kill = 0
                         for r in range(-group_range,group_range): #scan in its vicinity
                                         if lidar1[i + r] == 1:
                                             kill = kill + 1 #count the trues around it
@@ -359,7 +359,7 @@ while True:
         #move motors based on camera input
         motorModules.move_MotorX(xtarget,0.0005)
         motorModules.move_MotorY(ytarget,0.0005)
-	values = []
+    values = []
 	
 
     if case == 2: #motors <-- lidar

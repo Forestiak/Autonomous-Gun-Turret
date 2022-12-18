@@ -20,8 +20,9 @@ import math
 import queue
 
 case = 0 #fsm
-
-angle = 90 # Angle which the turret is facing
+laserpin = None #laser pin
+anglex = 90 # Angle which the turret is facing
+angley = 90
 #1 step = 0.9 degrees
 
 #lidar variables:
@@ -51,6 +52,7 @@ GPIO.setwarnings(False)
 # Setup pin layout on PI
 GPIO.setmode(GPIO.BOARD)
 # Establish Pins in software
+GPIO.setup(laserpin, GPIO.OUT)
 GPIO.setup(DIRH, GPIO.OUT)
 GPIO.setup(STEPH, GPIO.OUT)
 GPIO.setup(DIRV, GPIO.OUT)
@@ -131,9 +133,6 @@ bottom = 0
 j=0
 Encodings=[]
 Names=[]
-
-xtarget = 2000
-ytarget = 2000
     
 scale=.7
 
@@ -153,7 +152,21 @@ def distance(x,y,):
     else:
         return True
 
+def motorlimitx (x):
+    if x + anglex > 180:
+        x = 180 - anglex
+    if x + anglex < 0:
+        x = anglex - 180
 
+    return x
+
+def motorlimity (y):
+    if y + angley > 45:
+        y = 45 - angley
+    if y + angley < 0:
+        y = angley - 45
+
+    return y
 
 with open('/home/aau/PyPro/faceRecognizer/train.pkl','rb') as f:
 	Names=pickle.load(f)
@@ -341,7 +354,7 @@ while True:
                 return values
 
             for i in range(0,values.qsize()): #delete objectives near camera center
-                if abs(values(i) - angle) > coincidence:
+                if abs(values(i) - anglex) > coincidence:
                     values.pop(i)
                     
             if xtarget == 2000 & ytarget == 2000: #if camera didnt detect something --> case = 1
@@ -352,26 +365,36 @@ while True:
             rospy.spin() #tell the node to enter a loop where it will process any incoming messages on the /scan topic, passing them to the callback function as they are received. This loop will run until the node is shut down or the program is terminated.
 
     if case == 1: #motors <-- camera
-
+        GPIO.output(laserpin, GPIO.HIGH)
+        if pf == False:
+            GPIO.output(laserpin, GPIO.LOW)
         #pixels --> steps
         xtarget = max(1,round((xtarget*0.9)-5))
         ytarget = max(1,round((ytarget*0.9)-5))
+        #motor limit
+        xtarget = motorlimitx (xtarget)
+        ytarget = motorlimity (ytarget)
+        #update angle(s)
+        angley = angley + ytarget
+        anglex = anglex + xtarget
         #move motors based on camera input
         motorModules.move_MotorX(xtarget,0.0005)
         motorModules.move_MotorY(ytarget,0.0005)
+        GPIO.output(laserpin, GPIO.LOW)
     values = []
 	
 
     if case == 2: #motors <-- lidar
-        
+        GPIO.output(laserpin, GPIO.HIGH)
         maxi = 0
         #select nearest target
         for i in range(0,values.qsize()):
 
             if values(i) > maxi:
                 maxi = values(i)
-
         maxi = maxi / 0.1125 #degrees --> steps
-
+        xtarget = motorlimitx (xtarget) #motor limit
+        anglex = anglex + xtarget #update angle(s)
         motorModules.move_MotorX(maxi,0.0005) #move
         #0.1125 degrees = 1 step
+        GPIO.output(laserpin, GPIO.LOW)

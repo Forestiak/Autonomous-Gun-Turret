@@ -20,7 +20,7 @@ import math
 import queue
 
 
-laserpin = 3 #laser pin
+laserpin = 15 #laser pin
 anglex = 90 # Angle which the turret is facing
 angley = 90
 #1 step = 0.9 degrees
@@ -46,11 +46,12 @@ STEPV = 32
 # 0/1 used to signify clockwise or counterclockwise.
 CW = 1
 CCW = 0
+GPIO.cleanup()
 GPIO.setwarnings(False)
 # Setup pin layout on PI
 GPIO.setmode(GPIO.BOARD)
 # Establish Pins in software
-GPIO.setup(laserpin, GPIO.OUT)
+#GPIO.setup(laserpin, GPIO.OUT)
 GPIO.setup(DIRH, GPIO.OUT)
 GPIO.setup(STEPH, GPIO.OUT)
 GPIO.setup(DIRV, GPIO.OUT)
@@ -59,11 +60,9 @@ GPIO.setup(STEPV, GPIO.OUT)
 GPIO.output(DIRH, CW)
 GPIO.output(DIRV, CW)
 class motorModules():
-    def __init__(self):
-        self.pwmH = GPIO.PWM(STEPH, 50)
-        self.pwmV = GPIO.PWM(STEPV, 50)
-    
-    def move_MotorX(self,stepsX,speed):
+    #Move the motor during a number of steps
+    def move_MotorX(stepsX,speed):
+        # Set the first direction you want it to spin
         global directionX
         # This is dependant on which way the A and B Ports on the motor driver are connected
         if stepsX < 0:
@@ -74,12 +73,16 @@ class motorModules():
         else:
             stepsX = 0
         GPIO.output(DIRH, directionX)
-        self.pwmH.start(speed)
-        self.pwmH.ChangeDutyCycle(speed)
-        sleep(abs(stepsX / 20))
-        self.pwmH.stop()
+        for x in range(stepsX // 20):
+                GPIO.output(STEPH, GPIO.HIGH)
+                sleep(speed)
+                GPIO.output(STEPH, GPIO.LOW)
+                sleep(speed)
 
-    def move_MotorY(self,stepsY,speed):
+
+
+    def move_MotorY(stepsY,speed):
+        # Set the first direction you want it to spin
         global directionY
         if stepsY > 0:
             directionY = CW
@@ -88,14 +91,13 @@ class motorModules():
             stepsY = abs(stepsY)
         else:
             stepsY = 0
+        print(stepsY)
         GPIO.output(DIRV, directionY)
-        self.pwmV.start(speed)
-        self.pwmV.ChangeDutyCycle(speed)
-        sleep(abs(stepsY / 20))
-        self.pwmV.stop()
-
-# your code
-GPIO.cleanup()
+        for x in range(stepsY // 20):
+                GPIO.output(STEPV, GPIO.HIGH)
+                sleep(speed)
+                GPIO.output(STEPV, GPIO.LOW)
+                sleep(speed)
 
 # parse the command line
 parser = argparse.ArgumentParser(description="Run pose estimation DNN on a video/image stream.", 
@@ -259,9 +261,10 @@ while True:
                         ytarget=centery 
 
                 print(name , " is at x:",centerx , ", y:" , centery)
-        GPIO.output(laserpin, GPIO.HIGH)
+        #GPIO.output(laserpin, GPIO.HIGH)
         if pf == False:
-            GPIO.output(laserpin, GPIO.LOW)
+            laserpin = 5
+            #GPIO.output(laserpin, GPIO.LOW)
         #pixels --> steps
         xtarget = max(1,round((xtarget*0.9)-5))
         ytarget = max(1,round((ytarget*0.9)-5))
@@ -274,12 +277,10 @@ while True:
         #move motors based on camera input
         motorModules.move_MotorX(xtarget,0.0005)
         motorModules.move_MotorY(ytarget,0.0005)
-        GPIO.output(laserpin, GPIO.LOW)
+        #GPIO.output(laserpin, GPIO.LOW)
       
     if len(poses)>0:
         cv2.imshow("Image", rec)
     else:
         cv2.imshow("Image", img)
     cv2.waitKey(1)
-
-   

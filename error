@@ -1,1 +1,0 @@
-AttributeError: type object 'jetson.inference.poseNet' has no attribute 'create'

@@ -223,15 +223,9 @@ while True:
 
         #Rectangle marker
         rect_img = frame[(int(right1.y)+10):(int(left1.y)-10), (int(right1.x)+10):(int(left1.x)-10)]
-        
-        #sketcher_rect = rect_img
-        #sketcher_rect = sketch_transform(sketcher_rect)
-        
-        #Conversion for 3 channels to put back on original image (streaming)
-        #sketcher_rect_rgb = cv2.cvtColor(sketcher_rect, cv2.COLOR_BGR2RGB)
-        
+       
         #Replacing the sketched image on Region of Interest
-        #frame[bottom_right[1]: upper_left[1]  , bottom_right[0] : upper_left[0]] = sketcher_rect_rgb
+        
         if rect_img.any() != False:
             frameSmall=cv2.resize(rect_img,(0,0),fx=scale,fy=scale)
             
@@ -260,15 +254,6 @@ while True:
                     ytarget=centery
 
             print(name , " is at x:",centerx , ", y:" , centery)
-                
-        if pf == False:
-           or limit
-        #xtarget = motorlimitx (xtarget)
-        #ytarget = motorlimity (ytarget)
-        #update angle(s)
-        #angley = angley + ytarget
-        #anglex = anglex + xtarget
-        #move motors based on camera input
         
         if(not(xtarget>1080 or ytarget>720)):
             motorModules.move_MotorX(xtarget,0.0005)
@@ -286,13 +271,6 @@ while True:
         #pixels --> steps
         xtargetx = max(1,round((xtarget*0.9)-5))
         ytargety = max(1,round((ytarget*0.9)-5))
-        #motor limit
-        #xtarget = motorlimitx (xtarget)
-        #ytarget = motorlimity (ytarget)
-        #update angle(s)
-        #angley = angley + ytarget
-        #anglex = anglex + xtarget
-        #move motors based on camera input
         
         if(not(xtarget>1080 or ytarget>720)):
             motorModules.move_MotorX(xtarget,0.0005)
